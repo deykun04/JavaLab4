@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+
 public class BookstoreApp {
 
     public static class Book {
@@ -48,13 +49,30 @@ public class BookstoreApp {
             return "Title: " + title + ", Author: " + author + ", Publisher: " + publisher +
                     ", Year: " + year + ", Price: " + price;
         }
+        private static void printCatalog(ArrayList<Book> books) {
+            for (Book book : books) {
+                System.out.println(book);
+            }
+        }
+
+        public static ArrayList<Book> sortByPublisher(HashMap<Integer, Book> catalog) {
+            ArrayList<Book> sortedByPublisher = new ArrayList<>(catalog.values());
+            sortedByPublisher.sort(Comparator.comparing(Book::getPublisher));
+            return sortedByPublisher;
+        }
+
+        public static ArrayList<Book> sortByPrice(HashMap<Integer, Book> catalog) {
+            ArrayList<Book> sortedByPrice = new ArrayList<>(catalog.values());
+            sortedByPrice.sort(Comparator.comparing(Book::getPrice));
+            return sortedByPrice;
+        }
     }
 
     public static void main(String[] args) {
         HashMap<Integer, Book> catalog = new HashMap<>();
 
         try (Scanner scanner = new Scanner(System.in)) {
-            for (int i = 1; i <= 5; i++) {
+            for (int i = 1; i <= 3; i++) {
                 System.out.println("Enter details for book " + i + ":");
                 System.out.print("Title: ");
                 String title = scanner.nextLine();
@@ -75,27 +93,20 @@ public class BookstoreApp {
                 catalog.put(i, new Book(title, author, publisher, year, price));
             }
 
-            // Виведення каталогу
             System.out.println("\nCatalog before sorting:");
             for (Book book : catalog.values()) {
                 System.out.println(book);
             }
 
             // Сортування за видавництвом
-            ArrayList<Book> sortedByPublisher = new ArrayList<>(catalog.values());
-            sortedByPublisher.sort(Comparator.comparing(Book::getPublisher));
+            ArrayList<Book> sortedByPublisher = Book.sortByPublisher(catalog);
             System.out.println("\nCatalog after sorting by publisher:");
-            for (Book book : sortedByPublisher) {
-                System.out.println(book);
-            }
+            Book.printCatalog(sortedByPublisher);
 
             // Сортування за ціною
-            ArrayList<Book> sortedByPrice = new ArrayList<>(catalog.values());
-            sortedByPrice.sort(Comparator.comparing(Book::getPrice));
+            ArrayList<Book> sortedByPrice = Book.sortByPrice(catalog);
             System.out.println("\nCatalog after sorting by price:");
-            for (Book book : sortedByPrice) {
-                System.out.println(book);
-            }
+            Book.printCatalog(sortedByPrice);
         } catch (InputMismatchException e) {
             System.out.println("Invalid input. Please enter a valid number.");
         }
