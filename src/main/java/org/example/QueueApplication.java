@@ -1,104 +1,160 @@
 package org.example;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Scanner;
 
+class AddressValue {
+    String city;
+    String street;
+    int houseNumber;
+    int apartmentNumber;
+
+    public AddressValue(String city, String street, int houseNumber, int apartmentNumber) {
+        this.city = city;
+        this.street = street;
+        this.houseNumber = houseNumber;
+        this.apartmentNumber = apartmentNumber;
+    }
+}
+
+class QueuePerson {
+    String lastName;
+    String firstName;
+    String middleName;
+    AddressValue address;
+    int priority;
+
+    public QueuePerson(String lastName, String firstName, String middleName, AddressValue address, int priority) {
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.address = address;
+        this.priority = priority;
+    }
+}
 
 public class QueueApplication {
-   public static class AddressValue {
-        String city;
-        String street;
-        int houseNumber;
-        int apartmentNumber;
+    private static LinkedList<QueuePerson> queue = new LinkedList<>();
+    private static Scanner scanner = new Scanner(System.in);
 
-        public AddressValue(String city, String street, int houseNumber, int apartmentNumber) {
-            this.city = city;
-            this.street = street;
-            this.houseNumber = houseNumber;
-            this.apartmentNumber = apartmentNumber;
-        }
-    }
-
-    public static class QueuePerson {
-        String lastName;
-        String firstName;
-        String middleName;
-        AddressValue address;
-        int priority;
-
-        public QueuePerson(String lastName, String firstName, String middleName, AddressValue address, int priority) {
-            this.lastName = lastName;
-            this.firstName = firstName;
-            this.middleName = middleName;
-            this.address = address;
-            this.priority = priority;
-        }
-
-        // Метод для оновлення пріоритету черговика
-        public void updatePriorityAndMoveToEnd(int newPriority, Queue<QueuePerson> queue) {
-            this.priority = newPriority;
-            queue.remove(this); // Видаляємо поточну особу з черги
-            queue.add(this);    // Додаємо її на кінець черги
-        }
-
-        @Override
-        public String toString() {
-            return "Name: " + lastName + " " + firstName + " " + middleName + "\n" +
-                    "Address: " + address.city + ", " + address.street + ", " + address.houseNumber;
-        }
-    }
     public static void main(String[] args) {
-        Queue<QueuePerson> queue = new LinkedList<>();
-        Scanner scanner = new Scanner(System.in);
+        // Додаємо початкові записи
+        addInitialPersons();
 
-        // Зчитування даних з клавіатури та додавання черговиків до черги
-        for (int i = 0; i < 3; i++) {
-            System.out.println("Enter data for QueuePerson " + (i + 1));
-            System.out.print("Last Name: ");
-            String lastName = scanner.nextLine();
-            System.out.print("First Name: ");
-            String firstName = scanner.nextLine();
-            System.out.print("Middle Name: ");
-            String middleName = scanner.nextLine();
-            System.out.print("City: ");
-            String city = scanner.nextLine();
-            System.out.print("Street: ");
-            String street = scanner.nextLine();
-            System.out.print("House Number: ");
-            int houseNumber = Integer.parseInt(scanner.nextLine());
-            System.out.print("Apartment Number (0 if none): ");
-            int apartmentNumber = Integer.parseInt(scanner.nextLine());
-            System.out.print("Priority: ");
-            int priority = Integer.parseInt(scanner.nextLine());
+        // Запускаємо головне меню
+        while (true) {
+            System.out.println("\n----- Головне меню -----");
+            System.out.println("1. Вивести список черговиків");
+            System.out.println("2. Додати нового черговика");
+            System.out.println("3. Видалити черговика");
+            System.out.println("4. Вихід");
+            System.out.print("Виберіть опцію: ");
 
-            AddressValue address = new AddressValue(city, street, houseNumber, apartmentNumber);
-            QueuePerson person = new QueuePerson(lastName, firstName, middleName, address, priority);
-            queue.add(person);
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Очищення буфера введення
+
+            switch (choice) {
+                case 1:
+                    printQueue();
+                    break;
+                case 2:
+                    addPerson();
+                    break;
+                case 3:
+                    removePerson();
+                    break;
+                case 4:
+                    System.out.println("Дякую за використання програми. До побачення!");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Невірний вибір. Спробуйте ще раз.");
+            }
         }
+    }
+
+    // Додаємо початкові записи
+    private static void addInitialPersons() {
+        queue.add(new QueuePerson("Іванов", "Іван", "Іванович", new AddressValue("Київ", "Вулиця 1", 10, 5), 3));
+        queue.add(new QueuePerson("Петров", "Петро", "Петрович", new AddressValue("Львів", "Вулиця 2", 5, 0), 1));
+        queue.add(new QueuePerson("Сидоров", "Олег", "Володимирович", new AddressValue("Харків", "Вулиця 3", 7, 2), 4));
+        queue.add(new QueuePerson("Коваленко", "Марія", "Анатоліївна", new AddressValue("Одеса", "Вулиця 4", 12, 0), 2));
+        queue.add(new QueuePerson("Бойко", "Тетяна", "Вікторівна", new AddressValue("Дніпро", "Вулиця 5", 8, 3), 5));
+    }
+
+    // Виводимо список черговиків
+    private static void printQueue() {
+        System.out.println("\nСписок черговиків:");
         for (QueuePerson person : queue) {
-            System.out.println("Priority: " + person.priority);
-            System.out.println(person);
-            System.out.println("--------------------");
+            System.out.println(person.lastName + " " + person.firstName + " " + person.middleName +
+                    " - Пріоритет: " + person.priority + ", Адреса: " + getAddressString(person.address));
         }
-        // Оновлення пріоритету черговика (приклад)
-        System.out.print("Enter the index of the person to update priority: ");
-        int indexToUpdate = Integer.parseInt(scanner.nextLine());
+    }
 
-        if (indexToUpdate >= 0 && indexToUpdate < queue.size()) {
-            System.out.print("Enter the new priority: ");
-            int newPriority = Integer.parseInt(scanner.nextLine());
-            QueuePerson personToUpdate = (QueuePerson) queue.toArray()[indexToUpdate];
-            personToUpdate.updatePriorityAndMoveToEnd(newPriority,queue);
+    // Додаємо нового черговика
+    private static void addPerson() {
+        System.out.println("\nДодавання нового черговика:");
+
+        System.out.print("Прізвище: ");
+        String lastName = scanner.nextLine();
+
+        System.out.print("Ім'я: ");
+        String firstName = scanner.nextLine();
+
+        System.out.print("По батькові: ");
+        String middleName = scanner.nextLine();
+
+        System.out.print("Місто: ");
+        String city = scanner.nextLine();
+
+        System.out.print("Вулиця: ");
+        String street = scanner.nextLine();
+
+        System.out.print("Будинок: ");
+        int houseNumber = scanner.nextInt();
+        scanner.nextLine(); // Очищення буфера введення
+
+        System.out.print("Квартира (0 якщо немає): ");
+        int apartmentNumber = scanner.nextInt();
+        scanner.nextLine(); // Очищення буфера введення
+
+        System.out.print("Пріоритет: ");
+        int priority = scanner.nextInt();
+        scanner.nextLine(); // Очищення буфера введення
+
+        AddressValue address = new AddressValue(city, street, houseNumber, apartmentNumber);
+        QueuePerson newPerson = new QueuePerson(lastName, firstName, middleName, address, priority);
+
+        queue.add(newPerson);
+        Collections.sort(queue, Comparator.comparingInt(p -> p.priority));
+
+        System.out.println("Черговик " + newPerson.lastName + " " + newPerson.firstName + " успішно доданий!");
+    }
+
+    // Видаляємо черговика
+    private static void removePerson() {
+        System.out.println("\nВидалення черговика:");
+        System.out.print("Введіть прізвище черговика для видалення: ");
+        String lastName = scanner.nextLine();
+
+        boolean removed = queue.removeIf(person -> person.lastName.equals(lastName));
+
+        if (removed) {
+            Collections.sort(queue, Comparator.comparingInt(p -> p.priority));
+            System.out.println("Черговик " + lastName + " успішно видалений.");
         } else {
-            System.out.println("Invalid index.");
+            System.out.println("Черговика з прізвищем " + lastName + " не знайдено.");
         }
+    }
 
-        // Виведення всіх черговиків в порядку оновленого пріоритету
-        for (QueuePerson person : queue) {
-            System.out.println("Priority: " + person.priority);
-            System.out.println(person);
-            System.out.println("--------------------");
+    // Метод для отримання рядкового представлення адреси
+    private static String getAddressString(AddressValue address) {
+        if (address.apartmentNumber == 0) {
+            return address.city + ", " + address.street + ", буд. " + address.houseNumber;
+        } else {
+            return address.city + ", " + address.street + ", буд. " + address.houseNumber + ", кв. " + address.apartmentNumber;
         }
     }
 }
