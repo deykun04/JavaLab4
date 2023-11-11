@@ -1,6 +1,5 @@
 package org.example;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -111,7 +110,7 @@ public class QueueApplication {
         }
 
         // Видаляємо черговика
-        private static void removePerson(LinkedList<QueuePerson> queue,String lastName) {
+        public static void removePerson(LinkedList<QueuePerson> queue,String lastName) {
             boolean removed = queue.removeIf(person -> person.lastName.equals(lastName));
 
             if (removed) {
